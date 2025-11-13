@@ -7,7 +7,7 @@ import './index.css'
 
 chrome.devtools.panels.create(
   "Hydration Error Detector",
-  "icon48.png",
+  "icon-48.png",
   "index.html",
   (panel) => {
     console.log("✅ DevTools panel created:", panel);
