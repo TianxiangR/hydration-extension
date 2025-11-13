@@ -7,7 +7,10 @@
     "scripting",
     "sidePanel",
     "activeTab",
-    "tabs"
+    "tabs",
+    "storage",
+    "downloads",
+    "background"
   ],
   "host_permissions": [
     "https://*/*"

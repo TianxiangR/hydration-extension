@@ -1,6 +1,5 @@
-
 // background.js
-const devtoolsPorts = new Map(); // tabId → devtools port
+const devtoolsPorts = new Map<number, chrome.runtime.Port>(); // tabId → devtools port
 
 // Cache the latest message for each tab
 // This allows devtools to get the current state when it opens

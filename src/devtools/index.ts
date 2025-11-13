@@ -1,3 +1,10 @@
+/**
+ * DevTools panel initialization
+ * 
+ * Creates the "Hydration Detector" panel in Chrome DevTools.
+ * The panel displays the main UI (index.html) where React components
+ * manage the DevTools connection via Redux.
+ */
 chrome.devtools.panels.create(
   "Hydration Detector",          // Panel title
   "icon48.png",                  // Panel icon
@@ -6,7 +13,3 @@ chrome.devtools.panels.create(
     console.log("✅ DevTools panel created:", panel);
   }
 );
-const tabId = chrome.devtools.inspectedWindow.tabId;
-console.log('tabId', tabId);
-
-export const devToolPort = chrome.runtime.connect({ name: `devtools:${tabId}` });
