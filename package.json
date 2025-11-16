@@ -1,11 +1,12 @@
 {
   "name": "hydration-extension",
   "private": true,
-  "version": "1.0.1",
+  "version": "1.0.2",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "yarn build:background && yarn build:content && yarn build:inject && yarn build:ui",
+    "sync-version": "node sync-version.cjs",
+    "build": "yarn sync-version && yarn build:background && yarn build:content && yarn build:inject && yarn build:ui",
     "build:background": "tsc -b && vite build --config vite.config.background.ts",
     "build:content": "tsc -b && vite build --config vite.config.content.ts",
     "build:inject": "tsc -b && vite build --config vite.config.inject.ts",

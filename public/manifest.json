@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Hydration Extension",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A Chrome extension that allows you to hydrate your code.",
   "icons": {
     "16": "icon-16.png",
@@ -10,27 +10,32 @@
     "128": "icon-128.png"
   },
   "permissions": [
-    "sidePanel",
-    "activeTab",
-    "tabs",
     "storage",
     "background"
   ],
   "devtools_page": "index.html",
   "background": {
     "service_worker": "background.js"
-  }, 
+  },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"],
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ],
       "run_at": "document_start"
     }
   ],
   "web_accessible_resources": [
     {
-      "resources": ["injected.js"],
-      "matches": ["<all_urls>"]
+      "resources": [
+        "injected.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
     }
   ]
 }
