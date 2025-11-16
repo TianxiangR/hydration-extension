@@ -1,0 +1,59 @@
+.main-content-container {
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
+  container-type: inline-size;
+  container-name: hydration-result;
+  width: min(100%, 720px);
+}
+
+.main-content-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 24px;
+  color: #1a202c;
+}
+
+/* Tabs */
+.main-content-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 0;
+}
+
+.tab-button {
+  padding: 12px 24px;
+  border: none;
+  background: none;
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s ease;
+  position: relative;
+
+  &:hover {
+    color: #3b82f6;
+    background-color: #f3f4f6;
+  }
+
+  &.active {
+    color: #3b82f6;
+    border-bottom-color: #3b82f6;
+    font-weight: 600;
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.main-content-body {
+  /* Content area for tab panels */
+}
+

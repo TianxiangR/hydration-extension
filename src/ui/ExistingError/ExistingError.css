@@ -1,0 +1,134 @@
+/* Existing Error Header */
+.existing-error-header {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border: 2px solid #93c5fd;
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.error-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.error-meta-item {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+}
+
+.error-meta-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 50px;
+}
+
+.error-meta-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a202c;
+  word-break: break-word;
+}
+
+.error-url {
+  font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+  color: #3b82f6;
+}
+
+.error-id {
+  font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+  font-size: 12px;
+  color: #6b7280;
+  word-break: break-all;
+}
+
+/* Status Messages */
+.status-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 20px 24px;
+  border-radius: 12px;
+  border: 2px solid;
+  margin-bottom: 24px;
+  background-color: #ffffff;
+  animation: fadeIn 0.3s ease-in;
+
+  &.status-info {
+    border-color: #93c5fd;
+    background-color: #eff6ff;
+
+    .status-icon {
+      font-size: 28px;
+    }
+
+    .status-text {
+      color: #1e40af;
+    }
+
+    .status-subtext {
+      color: #3b82f6;
+    }
+  }
+
+  &.status-loading {
+    border-color: #fbbf24;
+    background-color: #fffbeb;
+
+    .status-text {
+      color: #92400e;
+    }
+  }
+}
+
+.status-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.status-text {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.status-subtext {
+  font-size: 14px;
+  font-weight: 400;
+}
+
+/* Spinner Animation */
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid #f3f4f6;
+  border-top-color: #f59e0b;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

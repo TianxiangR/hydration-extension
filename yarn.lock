@@ -458,6 +458,18 @@
   resolved "https://pkgs.dev.azure.com/blzsft/19c5d1de-7692-49c1-815b-97c55e36bd9a/_packaging/blzsft_npm_regsitry/npm/registry/@pkgjs/parseargs/-/parseargs-0.11.0.tgz#a77ea742fab25775145434eb1d2328cf5013ac33"
   integrity sha1-p36nQvqyV3UUVDTrHSMoz1ATrDM=
 
+"@reduxjs/toolkit@^2.10.1":
+  version "2.10.1"
+  resolved "https://pkgs.dev.azure.com/blzsft/19c5d1de-7692-49c1-815b-97c55e36bd9a/_packaging/blzsft_npm_regsitry/npm/registry/@reduxjs/toolkit/-/toolkit-2.10.1.tgz#b3b9da21335eea409d3498544bcaf83b481a0195"
+  integrity sha1-s7naITNe6kCdNJhUS8r4O0gaAZU=
+  dependencies:
+    "@standard-schema/spec" "^1.0.0"
+    "@standard-schema/utils" "^0.3.0"
+    immer "^10.2.0"
+    redux "^5.0.1"
+    redux-thunk "^3.1.0"
+    reselect "^5.1.0"
+
 "@rolldown/pluginutils@1.0.0-beta.43":
   version "1.0.0-beta.43"
   resolved "https://pkgs.dev.azure.com/blzsft/19c5d1de-7692-49c1-815b-97c55e36bd9a/_packaging/blzsft_npm_regsitry/npm/registry/@rolldown/pluginutils/-/pluginutils-1.0.0-beta.43.tgz#fa8249860113711ad3c8053bc79cb07c79b77f62"
@@ -573,6 +585,16 @@
   resolved "https://pkgs.dev.azure.com/blzsft/19c5d1de-7692-49c1-815b-97c55e36bd9a/_packaging/blzsft_npm_regsitry/npm/registry/@rollup/rollup-win32-x64-msvc/-/rollup-win32-x64-msvc-4.53.2.tgz#d9ab606437fd072b2cb7df7e54bcdc7f1ccbe8b4"
   integrity sha1-2atgZDf9Bysst99+VLzcfxzL6LQ=
 
+"@standard-schema/spec@^1.0.0":
+  version "1.0.0"
+  resolved "https://pkgs.dev.azure.com/blzsft/19c5d1de-7692-49c1-815b-97c55e36bd9a/_packaging/blzsft_npm_regsitry/npm/registry/@standard-schema/spec/-/spec-1.0.0.tgz#f193b73dc316c4170f2e82a881da0f550d551b9c"
+  integrity sha1-8ZO3PcMWxBcPLoKogdoPVQ1VG5w=
+
+"@standard-schema/utils@^0.3.0":
+  version "0.3.0"
+  resolved "https://pkgs.dev.azure.com/blzsft/19c5d1de-7692-49c1-815b-97c55e36bd9a/_packaging/blzsft_npm_regsitry/npm/registry/@standard-schema/utils/-/utils-0.3.0.tgz#3d5e608f16c2390c10528e98e59aef6bf73cae7b"
+  integrity sha1-PV5gjxbCOQwQUo6Y5Zrva/c8rns=
+
 "@types/babel__core@^7.20.5":
   version "7.20.5"
   resolved "https://pkgs.dev.azure.com/blzsft/19c5d1de-7692-49c1-815b-97c55e36bd9a/_packaging/blzsft_npm_regsitry/npm/registry/@types/babel__core/-/babel__core-7.20.5.tgz#3df15f27ba85319caa07ba08d0721889bb39c017"
@@ -664,6 +686,18 @@
   integrity sha1-Jk5DBCGf+L6eHLTukjw7xthYcIk=
   dependencies:
     csstype "^3.0.2"
+
+"@types/use-sync-external-store@^0.0.6":
+  version "0.0.6"
+  resolved "https://pkgs.dev.azure.com/blzsft/19c5d1de-7692-49c1-815b-97c55e36bd9a/_packaging/blzsft_npm_regsitry/npm/registry/@types/use-sync-external-store/-/use-sync-external-store-0.0.6.tgz#60be8d21baab8c305132eb9cb912ed497852aadc"
+  integrity sha1-YL6NIbqrjDBRMuucuRLtSXhSqtw=
+
+"@types/uuid@^11.0.0":
+  version "11.0.0"
+  resolved "https://pkgs.dev.azure.com/blzsft/19c5d1de-7692-49c1-815b-97c55e36bd9a/_packaging/blzsft_npm_regsitry/npm/registry/@types/uuid/-/uuid-11.0.0.tgz#f4fa34bbf2af941148ef1973c4361fc43617971c"
+  integrity sha1-9Po0u/KvlBFI7xlzxDYfxDYXlxw=
+  dependencies:
+    uuid "*"
 
 "@typescript-eslint/eslint-plugin@8.46.4":
   version "8.46.4"
@@ -1274,6 +1308,11 @@ ignore@^7.0.0:
   resolved "https://pkgs.dev.azure.com/blzsft/19c5d1de-7692-49c1-815b-97c55e36bd9a/_packaging/blzsft_npm_regsitry/npm/registry/ignore/-/ignore-7.0.5.tgz#4cb5f6cd7d4c7ab0365738c7aea888baa6d7efd9"
   integrity sha1-TLX2zX1MerA2VzjHrqiIuqbX79k=
 
+immer@^10.2.0:
+  version "10.2.0"
+  resolved "https://pkgs.dev.azure.com/blzsft/19c5d1de-7692-49c1-815b-97c55e36bd9a/_packaging/blzsft_npm_regsitry/npm/registry/immer/-/immer-10.2.0.tgz#88a4ce06a1af64172d254b70f7cb04df51c871b1"
+  integrity sha1-iKTOBqGvZBctJUtw98sE31HIcbE=
+
 import-fresh@^3.2.1:
   version "3.3.1"
   resolved "https://pkgs.dev.azure.com/blzsft/19c5d1de-7692-49c1-815b-97c55e36bd9a/_packaging/blzsft_npm_regsitry/npm/registry/import-fresh/-/import-fresh-3.3.1.tgz#9cecb56503c0ada1f2741dbbd6546e4b13b57ccf"
@@ -1598,6 +1637,14 @@ react-dom@^19.2.0:
   dependencies:
     scheduler "^0.27.0"
 
+react-redux@^9.2.0:
+  version "9.2.0"
+  resolved "https://pkgs.dev.azure.com/blzsft/19c5d1de-7692-49c1-815b-97c55e36bd9a/_packaging/blzsft_npm_regsitry/npm/registry/react-redux/-/react-redux-9.2.0.tgz#96c3ab23fb9a3af2cb4654be4b51c989e32366f5"
+  integrity sha1-lsOrI/uaOvLLRlS+S1HJieMjZvU=
+  dependencies:
+    "@types/use-sync-external-store" "^0.0.6"
+    use-sync-external-store "^1.4.0"
+
 react-refresh@^0.18.0:
   version "0.18.0"
   resolved "https://pkgs.dev.azure.com/blzsft/19c5d1de-7692-49c1-815b-97c55e36bd9a/_packaging/blzsft_npm_regsitry/npm/registry/react-refresh/-/react-refresh-0.18.0.tgz#2dce97f4fe932a4d8142fa1630e475c1729c8062"
@@ -1607,6 +1654,21 @@ react@^19.2.0:
   version "19.2.0"
   resolved "https://pkgs.dev.azure.com/blzsft/19c5d1de-7692-49c1-815b-97c55e36bd9a/_packaging/blzsft_npm_regsitry/npm/registry/react/-/react-19.2.0.tgz#d33dd1721698f4376ae57a54098cb47fc75d93a5"
   integrity sha1-0z3RchaY9Ddq5XpUCYy0f8ddk6U=
+
+redux-thunk@^3.1.0:
+  version "3.1.0"
+  resolved "https://pkgs.dev.azure.com/blzsft/19c5d1de-7692-49c1-815b-97c55e36bd9a/_packaging/blzsft_npm_regsitry/npm/registry/redux-thunk/-/redux-thunk-3.1.0.tgz#94aa6e04977c30e14e892eae84978c1af6058ff3"
+  integrity sha1-lKpuBJd8MOFOiS6uhJeMGvYFj/M=
+
+redux@^5.0.1:
+  version "5.0.1"
+  resolved "https://pkgs.dev.azure.com/blzsft/19c5d1de-7692-49c1-815b-97c55e36bd9a/_packaging/blzsft_npm_regsitry/npm/registry/redux/-/redux-5.0.1.tgz#97fa26881ce5746500125585d5642c77b6e9447b"
+  integrity sha1-l/omiBzldGUAElWF1WQsd7bpRHs=
+
+reselect@^5.1.0:
+  version "5.1.1"
+  resolved "https://pkgs.dev.azure.com/blzsft/19c5d1de-7692-49c1-815b-97c55e36bd9a/_packaging/blzsft_npm_regsitry/npm/registry/reselect/-/reselect-5.1.1.tgz#c766b1eb5d558291e5e550298adb0becc24bb72e"
+  integrity sha1-x2ax611VgpHl5VApitsL7MJLty4=
 
 resolve-from@^4.0.0:
   version "4.0.0"
@@ -1814,6 +1876,16 @@ uri-js@^4.2.2:
   integrity sha1-mxpSWVIlhZ5V9mnZKPiMbFfyp34=
   dependencies:
     punycode "^2.1.0"
+
+use-sync-external-store@^1.4.0:
+  version "1.6.0"
+  resolved "https://pkgs.dev.azure.com/blzsft/19c5d1de-7692-49c1-815b-97c55e36bd9a/_packaging/blzsft_npm_regsitry/npm/registry/use-sync-external-store/-/use-sync-external-store-1.6.0.tgz#b174bfa65cb2b526732d9f2ac0a408027876f32d"
+  integrity sha1-sXS/plyytSZzLZ8qwKQIAnh28y0=
+
+uuid@*, uuid@^13.0.0:
+  version "13.0.0"
+  resolved "https://pkgs.dev.azure.com/blzsft/19c5d1de-7692-49c1-815b-97c55e36bd9a/_packaging/blzsft_npm_regsitry/npm/registry/uuid/-/uuid-13.0.0.tgz#263dc341b19b4d755eb8fe36b78d95a6b65707e8"
+  integrity sha1-Jj3DQbGbTXVeuP42t42VprZXB+g=
 
 vite@^7.2.2:
   version "7.2.2"

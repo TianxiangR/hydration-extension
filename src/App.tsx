@@ -1,14 +1,16 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
-import { HydrationResult } from './ui/HydrationResult/HydrationResult'
+import { useInitDevTool } from './hooks/useInitDevTool';
+import { MainContent } from './ui/MainContent/MainContent'
+import { Layout } from './ui/Layout/Layout'
 
 function App() {
+  useInitDevTool();
 
   return (
     <>
-      <HydrationResult />
+      <Layout>
+        <MainContent />
+      </Layout>
     </>
   )
 }

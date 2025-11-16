@@ -2,7 +2,6 @@ import { ChangeObject, diffLines } from "diff";
 import { hydrationDiff } from "../utils/hydrationDiff";
 import {format as prettierFormat } from "prettier/standalone";
 import * as prettierPluginHtml from "prettier/plugins/html"; // this path may work
-
 const injectScript = async () => {
   return new Promise((resolve, reject) => {
   const scriptUrl = chrome.runtime.getURL('injected.js');
@@ -73,6 +72,11 @@ export type CheckingHydrationMessage = {
 export type ReactHydrationFinishedMessage = {
   type: 'react-hydration-finished';
   data: {
+    id?: string; // UUID
+    url?: string; // Full URL
+    timestamp?: number;
+    initialHtml?: string; // Full initial HTML
+    postHydrationHtml?: string; // Full post-hydration HTML
     initialRoot?: string;
     hydratedRoot?: string;
     diff?: ChangeObject<string>[];
@@ -123,7 +127,7 @@ async function main() {
 
   window.addEventListener('react-hydration-finished', async  () => {
     chrome.runtime.sendMessage({ type: 'checking-hydration' });
- 
+
     const postHydrationHtml = document.documentElement.outerHTML;
     const hydrationResult = hydrationDiff(initialHtml, postHydrationHtml);
     console.log('hydrationResult', hydrationResult);
@@ -131,10 +135,10 @@ async function main() {
       console.log('hydrationResult.isEqual === false', hydrationResult);
       const initialRoot = new DOMParser().parseFromString(hydrationResult.initialRoot, 'text/html');
       const hydratedRoot = new DOMParser().parseFromString(hydrationResult.hydratedRoot, 'text/html');
-      const formattedInitialRoot = await prettierFormat(initialRoot.documentElement.outerHTML, { 
+      const formattedInitialRoot = await prettierFormat(initialRoot.body.innerHTML, { 
         parser: 'html', plugins: [prettierPluginHtml],
       });
-      const formattedHydratedRoot = await prettierFormat(hydratedRoot.documentElement.outerHTML, { 
+      const formattedHydratedRoot = await prettierFormat(hydratedRoot.body.innerHTML, { 
         parser: 'html', plugins: [prettierPluginHtml],
       });
 
@@ -146,8 +150,13 @@ async function main() {
       chrome.runtime.sendMessage({
         type: 'react-hydration-finished',
         data: {
-          initialRoot: formattedInitialRoot,
-          hydratedRoot: formattedHydratedRoot,
+          id: crypto.randomUUID(), // Use native browser API instead of uuid package
+          url: window.location.href,
+          timestamp: Date.now(),
+          initialHtml,
+          postHydrationHtml,
+          initialRoot: initialRoot.body.innerHTML,
+          hydratedRoot: hydratedRoot.body.innerHTML,
           diff,
           isEqual: false,
         },
@@ -165,8 +174,6 @@ async function main() {
 
   await injectScript();
   runScript(installReactDevToolGlobalHook);
-
-
 }
 
 main();
