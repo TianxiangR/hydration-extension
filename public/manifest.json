@@ -10,16 +10,12 @@
     "128": "icon-128.png"
   },
   "permissions": [
-    "scripting",
     "sidePanel",
     "activeTab",
     "tabs",
     "storage",
     "downloads",
     "background"
-  ],
-  "host_permissions": [
-    "https://*/*"
   ],
   "devtools_page": "index.html",
   "background": {
