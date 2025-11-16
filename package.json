@@ -1,7 +1,7 @@
 {
   "name": "hydration-extension",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -11,7 +11,8 @@
     "build:inject": "tsc -b && vite build --config vite.config.inject.ts",
     "build:ui": "tsc -b && vite build --config vite.config.ui.ts",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "zip": "zip -r hydration-extension-v${npm_package_version}.zip dist"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.10.1",
