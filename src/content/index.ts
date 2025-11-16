@@ -4,132 +4,18 @@ import { format as prettierFormat } from "prettier/standalone";
 import * as prettierPluginHtml from "prettier/plugins/html";
 import { MessageType } from "../types/message";
 import { removeAllComments } from "../utils/dom";
-/**
- * Content Script Connection Manager
- * 
- * Manages the Chrome runtime port connection between content script and background.
- * Handles auto-reconnection on disconnect (e.g., BFCache, navigation, service worker restart).
- * Uses exponential backoff with a max delay of 5 seconds, retries indefinitely.
- */
-class ContentConnection {
-  private port: chrome.runtime.Port | null = null;
-  private reconnectAttempts = 0;
-  private reconnectDelay = 100; // ms
-  private reconnectTimeoutId: number | null = null;
+import { PortConnection } from "../utils/portConnection";
 
-  /**
-   * Initialize the connection
-   */
-  public connect(): void {
-    if (this.port) {
-      console.log('[Content Connection] Already connected');
-      return;
-    }
+type ContentMessage = {
+  type: string;
+  [key: string]: unknown;
+};
 
-    try {
-      this.port = chrome.runtime.connect({ name: 'content' });
-
-      console.log('[Content Connection] Connected:', this.port.name);
-      this.reconnectAttempts = 0;
-
-      // Set up disconnect handler with auto-reconnect
-      this.port.onDisconnect.addListener(this.handleDisconnect);
-    } catch (error) {
-      console.error('[Content Connection] Failed to connect:', error);
-      this.scheduleReconnect();
-    }
-  }
-
-  /**
-   * Handle port disconnection
-   */
-  private handleDisconnect = () => {
-    console.warn('[Content Connection] Port disconnected — likely BFCache, navigation, or service worker restart');
-    
-    this.port = null;
-    
-    // Schedule reconnection
-    this.scheduleReconnect();
-  };
-
-  /**
-   * Schedule a reconnection attempt
-   */
-  private scheduleReconnect(): void {
-    // Clear any existing timeout
-    if (this.reconnectTimeoutId !== null) {
-      clearTimeout(this.reconnectTimeoutId);
-    }
-
-    this.reconnectAttempts++;
-    // Cap the delay at 5 seconds to avoid too long waits
-    const delay = Math.min(
-      this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1),
-      5000
-    );
-
-    console.log(`[Content Connection] Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts})...`);
-
-    this.reconnectTimeoutId = window.setTimeout(() => {
-      this.connect();
-    }, delay);
-  }
-
-  /**
-   * Send a message to the background script
-   */
-  public sendMessage(message: { type: string; [key: string]: unknown }): void {
-    if (!this.port) {
-      console.warn('[Content Connection] Cannot send message - not connected, attempting to reconnect:', message);
-      this.connect();
-      // Queue the message to be sent after reconnection attempt
-      setTimeout(() => {
-        if (this.port) {
-          try {
-            this.port.postMessage(message);
-          } catch (error) {
-            console.error('[Content Connection] Failed to send queued message:', error);
-          }
-        }
-      }, 100);
-      return;
-    }
-
-    try {
-      this.port.postMessage(message);
-    } catch (error) {
-      console.error('[Content Connection] Failed to send message:', error);
-      // Connection might be dead, trigger reconnect
-      this.handleDisconnect();
-    }
-  }
-
-  /**
-   * Check if currently connected
-   */
-  public isConnected(): boolean {
-    return this.port !== null;
-  }
-
-  /**
-   * Manually disconnect (for cleanup)
-   */
-  public disconnect(): void {
-    if (this.reconnectTimeoutId !== null) {
-      clearTimeout(this.reconnectTimeoutId);
-      this.reconnectTimeoutId = null;
-    }
-    
-    if (this.port) {
-      console.log('[Content Connection] Manually disconnecting');
-      this.port.disconnect();
-      this.port = null;
-    }
-  }
-}
-
-// Create singleton instance
-const contentConnection = new ContentConnection();
+// Create content script connection instance using the generic PortConnection
+const contentConnection = new PortConnection<ContentMessage>({
+  portName: 'content',
+  logPrefix: '[Content Connection]',
+});
 
 const injectScript = async () => {
   return new Promise((resolve, reject) => {
