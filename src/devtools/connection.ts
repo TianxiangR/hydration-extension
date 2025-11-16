@@ -43,7 +43,7 @@ class DevToolsConnection {
 
     try {
       this.port = chrome.runtime.connect({
-        name: `devtools:${chrome.devtools.inspectedWindow.tabId}`
+        name: `devtools`
       });
 
       console.log('[DevTools Connection] Connected:', this.port.name);
