@@ -2,8 +2,8 @@ import { ChangeObject, diffLines } from "diff";
 import { hydrationDiff } from "../utils/hydrationDiff";
 import { format as prettierFormat } from "prettier/standalone";
 import * as prettierPluginHtml from "prettier/plugins/html";
+import { MessageType } from "../types/message";
 import { removeAllComments } from "../utils/dom";
-
 /**
  * Content Script Connection Manager
  * 
@@ -229,7 +229,7 @@ async function main() {
   contentConnection.connect();
 
   // Notify that page is loading
-  contentConnection.sendMessage({ type: 'page-loading' });
+  contentConnection.sendMessage({ type: MessageType.PAGE_LOADING });
 
   let initialHtml = '';
   let reactDetected = false;
@@ -242,7 +242,7 @@ async function main() {
     reactDetectionTimeout = window.setTimeout(() => {
       if (!reactDetected) {
         console.log('No React detected after 5 seconds');
-        contentConnection.sendMessage({ type: 'no-react-detected' });
+        contentConnection.sendMessage({ type: MessageType.NO_REACT_DETECTED });
       }
     }, 5000);
   });
@@ -254,11 +254,11 @@ async function main() {
       clearTimeout(reactDetectionTimeout);
     }
     console.log('React detected via inject!');
-    contentConnection.sendMessage({ type: 'react-detected' });
+    contentConnection.sendMessage({ type: MessageType.REACT_DETECTED });
   });
 
   window.addEventListener('react-hydration-finished', async () => {
-    contentConnection.sendMessage({ type: 'checking-hydration' });
+    contentConnection.sendMessage({ type: MessageType.CHECKING_HYDRATION });
 
     const postHydrationHtml = document.documentElement.outerHTML;
     const hydrationResult = hydrationDiff(initialHtml, postHydrationHtml);
@@ -283,7 +283,7 @@ async function main() {
       const diff = diffLines(formattedInitialRoot, formattedHydratedRoot);
 
       contentConnection.sendMessage({
-        type: 'react-hydration-finished',
+        type: MessageType.REACT_HYDRATION_FINISHED,
         data: {
           id: crypto.randomUUID(),
           url: window.location.href,
@@ -298,7 +298,7 @@ async function main() {
       });
     } else {
       contentConnection.sendMessage({
-        type: 'react-hydration-finished',
+        type: MessageType.REACT_HYDRATION_FINISHED,
         data: {
           isEqual: true,
         },

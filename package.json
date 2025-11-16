@@ -5,7 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "yarn build:background && yarn build:content && yarn build:inject && yarn build:ui",
+    "build:background": "tsc -b && vite build --config vite.config.background.ts",
+    "build:content": "tsc -b && vite build --config vite.config.content.ts",
+    "build:inject": "tsc -b && vite build --config vite.config.inject.ts",
+    "build:ui": "tsc -b && vite build --config vite.config.ui.ts",
     "lint": "eslint .",
     "preview": "vite preview"
   },

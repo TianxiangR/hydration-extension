@@ -2,6 +2,8 @@
 // const devtoolsPorts = new Map<number, chrome.runtime.Port>(); // tabId → devtools port
 
 import { ReactHydrationFinishedMessage } from "../content";
+import { MessageType } from "../types/message";
+import { PageStatus } from "../types/page";
 
 // // Cache the latest message for each tab
 // // This allows devtools to get the current state when it opens
@@ -69,14 +71,6 @@ import { ReactHydrationFinishedMessage } from "../content";
 //   devtoolsPorts.delete(tabId);
 // });
 
-type PageStatus = 
-  | 'idle'
-  | 'loading'
-  | 'react-detected'
-  | 'checking-hydration'
-  | 'no-react-detected'
-  | 'hydration-complete';
-
 type ContentScriptInfo = {
   tabId: number;
   port: chrome.runtime.Port;
@@ -105,7 +99,7 @@ const handleContentScriptConnect = (port: chrome.runtime.Port) => {
   ports.content.set(tabId, {
     tabId,
     port,
-    status: 'idle',
+    status: PageStatus.IDLE,
     currentError: null,
   });
 
@@ -122,7 +116,7 @@ const handleContentScriptConnect = (port: chrome.runtime.Port) => {
         return;
       }
       devtoolsInfo.port.postMessage({
-        type: 'devtools-status-update',
+        type: MessageType.DEVTOOLS_STATUS_UPDATE,
         data: {
           status: contentInfo.status,
           currentError: contentInfo.currentError,
@@ -131,29 +125,29 @@ const handleContentScriptConnect = (port: chrome.runtime.Port) => {
     }
 
     switch (msg.type) {
-      case 'react-hydration-finished': {
+      case MessageType.REACT_HYDRATION_FINISHED: {
         contentInfo.currentError = msg.data;
-        contentInfo.status = 'hydration-complete';
+        contentInfo.status = PageStatus.HYDRATION_COMPLETE;
         sendStatusUpdate();
         break;
       }
-      case 'page-loading': {
-        contentInfo.status = 'loading';
+      case MessageType.PAGE_LOADING: {
+        contentInfo.status = PageStatus.LOADING;
         sendStatusUpdate();
         break;
       }
-      case 'react-detected': {
-        contentInfo.status = 'react-detected';
+      case MessageType.REACT_DETECTED: {
+        contentInfo.status = PageStatus.REACT_DETECTED;
         sendStatusUpdate();
         break;
       }
-      case 'checking-hydration': {
-        contentInfo.status = 'checking-hydration';
+      case MessageType.CHECKING_HYDRATION: {
+        contentInfo.status = PageStatus.CHECKING_HYDRATION;
         sendStatusUpdate();
         break;
       }
-      case 'no-react-detected': {
-        contentInfo.status = 'no-react-detected';
+      case MessageType.NO_REACT_DETECTED: {
+        contentInfo.status = PageStatus.NO_REACT_DETECTED;
         sendStatusUpdate();
         break;
       }
@@ -177,7 +171,7 @@ const handleDevtoolsConnect = (port: chrome.runtime.Port) => {
     console.log('Message from devtools:', msg);
 
     switch (msg.type) {
-      case 'devtools-ready': {
+      case MessageType.DEVTOOLS_READY: {
         // DevTools provides the inspected tab ID in the message
         const tabId = msg.tabId;
         if (typeof tabId !== 'number') {
@@ -197,7 +191,7 @@ const handleDevtoolsConnect = (port: chrome.runtime.Port) => {
         const contentInfo = ports.content.get(tabId);
         if (contentInfo) {
           port.postMessage({
-            type: 'devtools-status-update',
+            type: MessageType.DEVTOOLS_STATUS_UPDATE,
             data: {
               status: contentInfo.status,
               currentError: contentInfo.currentError,
