@@ -17,9 +17,6 @@ export default defineConfig({
         entryFileNames: '[name].js',
         chunkFileNames: '[name].js',
         assetFileNames: '[name].[ext]',
-        manualChunks(id) {
-          if (id.includes('node_modules')) return 'vendor';
-        },
       },
     },
   },
