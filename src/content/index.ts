@@ -1,10 +1,139 @@
 import { ChangeObject, diffLines } from "diff";
 import { hydrationDiff } from "../utils/hydrationDiff";
-import {format as prettierFormat } from "prettier/standalone";
-import * as prettierPluginHtml from "prettier/plugins/html"; // this path may work
+import { format as prettierFormat } from "prettier/standalone";
+import * as prettierPluginHtml from "prettier/plugins/html";
+import { removeAllComments } from "../utils/dom";
+
+/**
+ * Content Script Connection Manager
+ * 
+ * Manages the Chrome runtime port connection between content script and background.
+ * Handles auto-reconnection on disconnect (e.g., BFCache, navigation, service worker restart).
+ * Uses exponential backoff with a max delay of 5 seconds, retries indefinitely.
+ */
+class ContentConnection {
+  private port: chrome.runtime.Port | null = null;
+  private reconnectAttempts = 0;
+  private reconnectDelay = 100; // ms
+  private reconnectTimeoutId: number | null = null;
+
+  /**
+   * Initialize the connection
+   */
+  public connect(): void {
+    if (this.port) {
+      console.log('[Content Connection] Already connected');
+      return;
+    }
+
+    try {
+      this.port = chrome.runtime.connect({ name: 'content' });
+
+      console.log('[Content Connection] Connected:', this.port.name);
+      this.reconnectAttempts = 0;
+
+      // Set up disconnect handler with auto-reconnect
+      this.port.onDisconnect.addListener(this.handleDisconnect);
+    } catch (error) {
+      console.error('[Content Connection] Failed to connect:', error);
+      this.scheduleReconnect();
+    }
+  }
+
+  /**
+   * Handle port disconnection
+   */
+  private handleDisconnect = () => {
+    console.warn('[Content Connection] Port disconnected — likely BFCache, navigation, or service worker restart');
+    
+    this.port = null;
+    
+    // Schedule reconnection
+    this.scheduleReconnect();
+  };
+
+  /**
+   * Schedule a reconnection attempt
+   */
+  private scheduleReconnect(): void {
+    // Clear any existing timeout
+    if (this.reconnectTimeoutId !== null) {
+      clearTimeout(this.reconnectTimeoutId);
+    }
+
+    this.reconnectAttempts++;
+    // Cap the delay at 5 seconds to avoid too long waits
+    const delay = Math.min(
+      this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1),
+      5000
+    );
+
+    console.log(`[Content Connection] Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts})...`);
+
+    this.reconnectTimeoutId = window.setTimeout(() => {
+      this.connect();
+    }, delay);
+  }
+
+  /**
+   * Send a message to the background script
+   */
+  public sendMessage(message: { type: string; [key: string]: unknown }): void {
+    if (!this.port) {
+      console.warn('[Content Connection] Cannot send message - not connected, attempting to reconnect:', message);
+      this.connect();
+      // Queue the message to be sent after reconnection attempt
+      setTimeout(() => {
+        if (this.port) {
+          try {
+            this.port.postMessage(message);
+          } catch (error) {
+            console.error('[Content Connection] Failed to send queued message:', error);
+          }
+        }
+      }, 100);
+      return;
+    }
+
+    try {
+      this.port.postMessage(message);
+    } catch (error) {
+      console.error('[Content Connection] Failed to send message:', error);
+      // Connection might be dead, trigger reconnect
+      this.handleDisconnect();
+    }
+  }
+
+  /**
+   * Check if currently connected
+   */
+  public isConnected(): boolean {
+    return this.port !== null;
+  }
+
+  /**
+   * Manually disconnect (for cleanup)
+   */
+  public disconnect(): void {
+    if (this.reconnectTimeoutId !== null) {
+      clearTimeout(this.reconnectTimeoutId);
+      this.reconnectTimeoutId = null;
+    }
+    
+    if (this.port) {
+      console.log('[Content Connection] Manually disconnecting');
+      this.port.disconnect();
+      this.port = null;
+    }
+  }
+}
+
+// Create singleton instance
+const contentConnection = new ContentConnection();
+
 const injectScript = async () => {
   return new Promise((resolve, reject) => {
-  const scriptUrl = chrome.runtime.getURL('injected.js');
+    const scriptUrl = chrome.runtime.getURL('injected.js');
     const script = document.createElement('script');
     script.onload = () => {
       resolve(true);
@@ -96,8 +225,11 @@ export type HydrationMessage =
   | NoReactDetectedMessage;
 
 async function main() {
+  // Initialize connection
+  contentConnection.connect();
+
   // Notify that page is loading
-  chrome.runtime.sendMessage({ type: 'page-loading' });
+  contentConnection.sendMessage({ type: 'page-loading' });
 
   let initialHtml = '';
   let reactDetected = false;
@@ -106,13 +238,13 @@ async function main() {
   window.addEventListener('DOMContentLoaded', () => {
     initialHtml = document.documentElement.outerHTML;
 
-      // Set timeout to check if React was detected
-  reactDetectionTimeout = window.setTimeout(() => {
-    if (!reactDetected) {
-      console.log('No React detected after 5 seconds');
-      chrome.runtime.sendMessage({ type: 'no-react-detected' });
-    }
-  }, 5000);
+    // Set timeout to check if React was detected
+    reactDetectionTimeout = window.setTimeout(() => {
+      if (!reactDetected) {
+        console.log('No React detected after 5 seconds');
+        contentConnection.sendMessage({ type: 'no-react-detected' });
+      }
+    }, 5000);
   });
 
   // Listen for React detection via inject method
@@ -122,54 +254,56 @@ async function main() {
       clearTimeout(reactDetectionTimeout);
     }
     console.log('React detected via inject!');
-    chrome.runtime.sendMessage({ type: 'react-detected' });
+    contentConnection.sendMessage({ type: 'react-detected' });
   });
 
-  window.addEventListener('react-hydration-finished', async  () => {
-    chrome.runtime.sendMessage({ type: 'checking-hydration' });
+  window.addEventListener('react-hydration-finished', async () => {
+    contentConnection.sendMessage({ type: 'checking-hydration' });
 
     const postHydrationHtml = document.documentElement.outerHTML;
     const hydrationResult = hydrationDiff(initialHtml, postHydrationHtml);
     console.log('hydrationResult', hydrationResult);
     if (hydrationResult?.isEqual === false) {
       console.log('hydrationResult.isEqual === false', hydrationResult);
-      const initialRoot = new DOMParser().parseFromString(hydrationResult.initialRoot, 'text/html');
-      const hydratedRoot = new DOMParser().parseFromString(hydrationResult.hydratedRoot, 'text/html');
-      const formattedInitialRoot = await prettierFormat(initialRoot.body.innerHTML, { 
+      const initialDoc = new DOMParser().parseFromString(hydrationResult.initialRoot, 'text/html');
+      const hydratedDoc = new DOMParser().parseFromString(hydrationResult.hydratedRoot, 'text/html');
+      removeAllComments(initialDoc.documentElement);
+      removeAllComments(hydratedDoc.documentElement);
+      const formattedInitialRoot = await prettierFormat(initialDoc.body.innerHTML, { 
         parser: 'html', plugins: [prettierPluginHtml],
       });
-      const formattedHydratedRoot = await prettierFormat(hydratedRoot.body.innerHTML, { 
+      console.log('formattedInitialRoot', formattedInitialRoot);
+      const formattedHydratedRoot = await prettierFormat(hydratedDoc.body.innerHTML, { 
         parser: 'html', plugins: [prettierPluginHtml],
       });
 
       console.log(formattedInitialRoot);
-      console.log( formattedHydratedRoot);
+      console.log(formattedHydratedRoot);
       
       const diff = diffLines(formattedInitialRoot, formattedHydratedRoot);
 
-      chrome.runtime.sendMessage({
+      contentConnection.sendMessage({
         type: 'react-hydration-finished',
         data: {
-          id: crypto.randomUUID(), // Use native browser API instead of uuid package
+          id: crypto.randomUUID(),
           url: window.location.href,
           timestamp: Date.now(),
           initialHtml,
           postHydrationHtml,
-          initialRoot: initialRoot.body.innerHTML,
-          hydratedRoot: hydratedRoot.body.innerHTML,
+          initialRoot: initialDoc.body.innerHTML,
+          hydratedRoot: hydratedDoc.body.innerHTML,
           diff,
           isEqual: false,
         },
       });
     } else {
-      chrome.runtime.sendMessage({
+      contentConnection.sendMessage({
         type: 'react-hydration-finished',
         data: {
           isEqual: true,
         },
       });
     }
-
   });
 
   await injectScript();

@@ -14,7 +14,6 @@
     "activeTab",
     "tabs",
     "storage",
-    "downloads",
     "background"
   ],
   "devtools_page": "index.html",

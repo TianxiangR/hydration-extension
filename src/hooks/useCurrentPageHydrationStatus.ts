@@ -1,11 +1,12 @@
 import { useEffect } from 'react';
-import { HydrationMessage, ReactHydrationFinishedMessage } from '../content';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { setAppStatus, setActiveErrorId, setCurrentError } from '../store/slices/uiSlice';
 import { hydrationErrorStorageService } from '../storage';
 import { HydrationErrorFull } from '../store/types';
 import { selectInitialized } from '../store/selectors';
 import { devToolsConnection } from '../devtools/connection';
+import { MessageType } from '../types/message';
+import { PageStatus } from '../types/page';
 
 /**
  * Hook for current page hydration status
@@ -21,62 +22,67 @@ export const useCurrentPageHydrationStatus = () => {
   useEffect(() => {
     if (!initialized) return;
 
-    const handler = async (message: HydrationMessage) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const handler = async (message: any) => {
       console.log('message received in useCurrentPageHydrationStatus', message);
-      switch (message?.type) {
-        case 'page-loading': {
-          dispatch(setAppStatus('loading'));
-          dispatch(setActiveErrorId(null)); // Clear active error on page reload
-          dispatch(setCurrentError(null)); // Clear current error on page reload
-          break;
-        }
-        case 'react-detected': {
-          dispatch(setAppStatus('react-detected'));
-          break;
-        }
-        case 'checking-hydration': {
-          dispatch(setAppStatus('checking-hydration'));
-          break;
-        }
-        case 'no-react-detected': {
-          dispatch(setAppStatus('no-react'));
-          break;
-        }
-        case 'react-hydration-finished': {
-          const hydrationMessage = message as ReactHydrationFinishedMessage;
-          if (hydrationMessage.data.isEqual === false && hydrationMessage.data.diff) {
-            // Create error data
-            const errorData: HydrationErrorFull = {
-              id: hydrationMessage.data.id!,
-              url: hydrationMessage.data.url!,
-              timestamp: hydrationMessage.data.timestamp!,
-              origin: new URL(hydrationMessage.data.url!).origin,
-              brief: hydrationMessage.data.initialRoot!.substring(0, 100),
-              initialHtml: hydrationMessage.data.initialHtml!,
-              postHydrationHtml: hydrationMessage.data.postHydrationHtml!,
-              diffResult: {
-                initialRoot: hydrationMessage.data.initialRoot!,
-                hydratedRoot: hydrationMessage.data.hydratedRoot!,
-                diff: hydrationMessage.data.diff,
-              },
-            };
-            
-            // Store in Redux state for current page display (isolated copy)
-            dispatch(setCurrentError(errorData));
-            
-            // Save to storage (service will update Redux)
-            await hydrationErrorStorageService.addError(errorData);
-            
-            // Set as active error
-            dispatch(setActiveErrorId(errorData.id));
+      
+      if (message.type === MessageType.DEVTOOLS_STATUS_UPDATE) {
+        const { status, currentError } = message.data;
+        
+        // Map PageStatus to appStatus
+        switch (status) {
+          case PageStatus.LOADING: {
+            dispatch(setAppStatus('loading'));
+            dispatch(setActiveErrorId(null)); // Clear active error on page reload
+            dispatch(setCurrentError(null)); // Clear current error on page reload
+            break;
+          }
+          case PageStatus.REACT_DETECTED: {
+            dispatch(setAppStatus('react-detected'));
+            break;
+          }
+          case PageStatus.CHECKING_HYDRATION: {
+            dispatch(setAppStatus('checking-hydration'));
+            break;
+          }
+          case PageStatus.NO_REACT_DETECTED: {
+            dispatch(setAppStatus('no-react'));
+            break;
+          }
+          case PageStatus.HYDRATION_COMPLETE: {
+            if (currentError && currentError.isEqual === false && currentError.diff) {
+              // Create error data
+              const errorData: HydrationErrorFull = {
+                id: currentError.id!,
+                url: currentError.url!,
+                timestamp: currentError.timestamp!,
+                origin: new URL(currentError.url!).origin,
+                brief: currentError.initialRoot!.substring(0, 100),
+                initialHtml: currentError.initialHtml!,
+                postHydrationHtml: currentError.postHydrationHtml!,
+                diffResult: {
+                  initialRoot: currentError.initialRoot!,
+                  hydratedRoot: currentError.hydratedRoot!,
+                  diff: currentError.diff,
+                },
+              };
+              
+              // Store in Redux state for current page display (isolated copy)
+              dispatch(setCurrentError(errorData));
+              
+              // Save to storage (service will update Redux)
+              await hydrationErrorStorageService.addError(errorData);
+              
+              // Set as active error
+              dispatch(setActiveErrorId(errorData.id));
+            } else {
+              dispatch(setCurrentError(null));
+            }
             
             // Update status
             dispatch(setAppStatus('hydration-complete'));
-          } else {
-            dispatch(setCurrentError(null));
-            dispatch(setAppStatus('hydration-complete'));
+            break;
           }
-          break;
         }
       }
     };

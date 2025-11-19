@@ -22,8 +22,11 @@ export const useInitDevToolsConnection = () => {
     devToolsConnection.connect();
     console.log('✅ DevTools connection initialized');
 
-    // Notify background that DevTools is ready
-    devToolsConnection.sendMessage({ type: 'devtools-ready' });
+    // Notify background that DevTools is ready, include inspected tab ID
+    devToolsConnection.sendMessage({ 
+      type: 'devtools-ready',
+      tabId: chrome.devtools.inspectedWindow.tabId
+    });
 
     // No cleanup needed - singleton handles connection lifecycle and auto-reconnects
   }, [initialized]);
