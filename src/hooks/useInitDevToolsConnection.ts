@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useAppSelector } from '../store/hooks';
 import { devToolsConnection } from '../devtools/connection';
+import { MessageType } from '../types/message';
 
 /**
  * Hook to initialize the DevTools connection
@@ -24,7 +25,7 @@ export const useInitDevToolsConnection = () => {
 
     // Notify background that DevTools is ready, include inspected tab ID
     devToolsConnection.sendMessage({ 
-      type: 'devtools-ready',
+      type: MessageType.DEVTOOLS_READY,
       tabId: chrome.devtools.inspectedWindow.tabId
     });
 
